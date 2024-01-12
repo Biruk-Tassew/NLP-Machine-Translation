@@ -8,7 +8,8 @@ const Hero = () => {
 
   const handleTranslate = async () => {
     try {
-      const response = await fetch('YOUR_API_ENDPOINT', {
+      const API_ENDPOINT = process.env.API_ENDPOINT;
+      const response = await fetch(API_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
