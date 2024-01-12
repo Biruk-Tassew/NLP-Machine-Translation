@@ -1,24 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Spinner } from "@nextui-org/react";
+import { Audio } from 'react-loader-spinner'
 
 const Hero = () => {
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
   const [errorPopup, setErrorPopup] = useState(false);
 
   const handleTranslate = async () => {
     try {
-      const API_ENDPOINT = process.env.API_ENDPOINT;
+      setLoading(true)
+      const API_ENDPOINT = "https://nlp-machine-translation-be.onrender.com/translate";
       const response = await fetch(API_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ "amharic_sentence": text }),
       });
 
       const data = await response.json();
-      setResult(data.result);
+      setResult(data.english_translation);
     } catch (error) {
       console.error('Error during translation:', error);
       setErrorPopup(true);
@@ -27,6 +31,8 @@ const Hero = () => {
       setTimeout(() => {
         setErrorPopup(false);
       }, 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,23 +81,38 @@ const Hero = () => {
                 </div>
 
                 <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+
                   <button
                     className="w-1/3 rounded-sm bg-primary px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
                     onClick={handleTranslate}
+                    disabled={loading}
                   >
-                    Translate
+                    <div className="flex items-center justify-center">
+                      {loading ? (
+                        <Audio
+                          height="20"
+                          width="20"
+                          color="white"
+                          ariaLabel="loading"
+                        />
+                      ) : (
+                        <span className="ml-2">Translate</span>
+                      )}
+                    </div>
                   </button>
+
+
                 </div>
               </div>
             </div>
           </div>
           {errorPopup && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-          <div className="bg-red-500 text-white p-4 rounded-md">
-            Translation error. Please try again.
-          </div>
-        </div>
-      )}
+            <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+              <div className="bg-red-500 text-white p-4 rounded-md">
+                Translation error. Please try again.
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="absolute right-0 top-0 z-[-1] opacity-30 lg:opacity-100">
